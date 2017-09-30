@@ -1,0 +1,111 @@
+buildscript {
+    ext {
+        kotlin_version = '1.1.51'
+        vertx_version = '3.4.2'
+    }
+
+    repositories {
+        jcenter()
+//    maven {
+//      url "https://oss.sonatype.org/content/repositories/iovertx-3684/"
+//    }
+    }
+
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '1.2.3'
+
+    id 'org.ysb33r.nodejs.base'  version '0.1'
+    id 'org.ysb33r.nodejs.npm'   version '0.1'
+}
+
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+
+npm {
+    executable searchPath()
+}
+
+task npmInit( type : org.ysb33r.gradle.nodejs.tasks.NpmTask ) {
+    command 'init'
+    cmdArgs '-f', '-y'
+}
+
+task npmInstall( type : org.ysb33r.gradle.nodejs.tasks.NpmTask ) {
+    command 'install'
+    cmdArgs '-f', '-y'
+}
+
+apply plugin: 'kotlin'
+
+sourceCompatibility = '1.8'
+
+mainClassName = 'io.vertx.core.Launcher'
+def mainVerticleName = 'com.lagerweij.hdd.webshop.MainVerticle'
+
+repositories {
+    jcenter()
+    mavenCentral()
+    maven {
+        url "https://oss.sonatype.org/content/repositories/iovertx-3684/"
+    }
+}
+dependencies {
+    compile "io.vertx:vertx-core:$vertx_version"
+    compile "io.vertx:vertx-web:$vertx_version"
+
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-runtime:$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+
+    compile "biz.paluch.logging:logstash-gelf:1.11.1"
+    compile "com.google.code.gson:gson:2.7"
+
+    compile "io.vertx:vertx-unit:$vertx_version"
+
+//    npm npmPackage(name : 'vuejs', tag : '1.0.29')
+//    npm npmPackage(name : 'axios', tag : '0.16.2')
+}
+
+// Redeploy watcher.
+run {
+    jvmArgs = [ "-Dtestprop=testval3" ]
+    systemProperty("testprop", "testval2")
+    args = [ 'run', mainVerticleName,
+            "-Djava.util.logging.config.file=" + rootProject.projectDir + "/logging.properties",
+            "--launcher-class=$mainClassName",
+            "--redeploy=src/**/*.*",
+            "--on-redeploy=./gradlew classes"
+    ]
+}
+
+// Naming and packaging settings for the "shadow jar".
+shadowJar {
+    baseName = 'webshop'
+    classifier = 'shadow'
+
+    manifest {
+        attributes 'Main-Verticle': mainVerticleName
+    }
+    mergeServiceFiles {
+        include 'META-INF/services/io.vertx.core.spi.VerticleFactory'
+    }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.13'
+}
+
+// Heroku relies on the 'stage' task to deploy.
+task stage {
+    dependsOn shadowJar
+}

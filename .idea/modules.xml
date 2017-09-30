@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/hdd-talk.iml" filepath="$PROJECT_DIR$/.idea/modules/hdd-talk.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/hdd-talk_main.iml" filepath="$PROJECT_DIR$/.idea/modules/hdd-talk_main.iml" group="hdd-talk" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/hdd-talk_test.iml" filepath="$PROJECT_DIR$/.idea/modules/hdd-talk_test.iml" group="hdd-talk" />
+    </modules>
+  </component>
+</project>

@@ -1,0 +1,28 @@
+{
+  "name": "hdd-talk",
+  "version": "1.0.0",
+  "description": "Code for demo during Hypothesis Driven Development talk",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wouterla/hdd-talk.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wouterla/hdd-talk/issues"
+  },
+  "homepage": "https://github.com/wouterla/hdd-talk#readme",
+  "dependencies": {
+    "axion": "^0.1.0",
+    "axios": "^0.16.2",
+    "bootstrap": "^3.3.7",
+    "vue-cookies": "^1.5.4",
+    "vuejs": "^1.0.29",
+    "webpack": "^3.6.0"
+  }
+}

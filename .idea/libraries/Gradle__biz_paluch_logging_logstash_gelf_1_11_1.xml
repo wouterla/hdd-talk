@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: biz.paluch.logging:logstash-gelf:1.11.1">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/biz.paluch.logging/logstash-gelf/1.11.1/12e1eb59c90028b8b4fbbe945228e1a0654bbfd6/logstash-gelf-1.11.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/biz.paluch.logging/logstash-gelf/1.11.1/99f9b6f5701861fa36b68cd687e289776fb79cd7/logstash-gelf-1.11.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

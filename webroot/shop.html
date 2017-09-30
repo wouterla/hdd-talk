@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script src="/node_modules/vue/dist/vue.js"></script>
+    <script src="/node_modules/vue-cookies/vue-cookies.js"></script>
+
+    <script src="/node_modules/axios/dist/axios.js"></script>
+
+    <link href="/node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/node_modules/bootstrap/dist/css/bootstrap-theme.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css"></link>
+    <title>My book shop</title>
+</head>
+<body>
+
+<div class="container theme-showcase" role="main">
+
+    <div class="page-header">
+        <h1>My Book Shop</h1>
+    </div>
+
+
+    <div id="shop" class="row">
+
+        <div id="products" class="col-sm-6">
+            <div id="product_detail" class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{{ currentProduct.title }} - $ {{ currentProduct.price }}</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div id="cover" class="col-sm-6">
+                            <img class="cover_image" id="cover_image" v-bind:src="currentProduct.img_url"/>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="row">
+                                <div class="col-sm-12 description" id="description">{{ currentProduct.description }}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-1"></div>
+                                <button class="col-sm-10" id="order_button" class="btn btn-lg btn-default"
+                                        v-on:click="addToCart">Add to cart</button>
+                                <div class="col-sm-1"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="navigation" class="panel-footer">
+                    <button class="btn btn-lg btn-default" v-on:click="previous">&lt; Previous</button>
+                    <button class="btn btn-lg btn-default" v-on:click="next">Next &gt;</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="cart" class="col-sm-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Shopping cart</h3>
+                </div>
+                <div class="panel-body">
+                    <!--<div id="cart-products" v-model="products"></div>-->
+                    <ul class="list-group">
+                        <li class="list-group-item" v-for="product in products">
+                            <img class="cart_image" v-bind:src="product.img_url"/>{{ product.title }}: {{ product.price
+                            }}
+                        </li>
+                    </ul>
+                    <div id="cart-price">Total: $ {{ price }}</div>
+                    <button class="btn btn-lg btn-default" v-on:click="buy">{{ buytext }}</button>
+                    <span id="added_text">{{ added_text }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script src="/shop.js"></script>
+<script src="/products.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+</body>
+</html>
