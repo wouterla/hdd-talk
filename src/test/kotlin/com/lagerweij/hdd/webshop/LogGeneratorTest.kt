@@ -1,11 +1,13 @@
 package com.lagerweij.hdd.webshop
 
+import com.google.gson.Gson
 import io.vertx.core.DeploymentOptions
 import io.vertx.core.Vertx
 import io.vertx.core.json.Json
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.unit.Async
 import io.vertx.ext.unit.TestContext
+import io.vertx.ext.unit.junit.Repeat
 import io.vertx.ext.unit.junit.VertxUnitRunner
 import org.junit.After
 import org.junit.Before
@@ -24,6 +26,9 @@ class MyFirstVerticleTest {
     private var vertx: Vertx? = null
     private var port: Int? = null
 
+    private val gson = Gson()
+
+
     /**
      * Before executing our test, let's deploy our verticle.
      *
@@ -36,6 +41,7 @@ class MyFirstVerticleTest {
     @Before
     @Throws(IOException::class)
     fun setUp(context: TestContext) {
+
         vertx = Vertx.vertx()
 
         // Let's configure the verticle to listen on the 'test' port (randomly picked).
@@ -49,7 +55,7 @@ class MyFirstVerticleTest {
                 )
 
         // We pass the options as the second parameter of the deployVerticle method.
-        vertx!!.deployVerticle(MyFirstVerticle::class.java!!.getName(), options, context.asyncAssertSuccess())
+        vertx!!.deployVerticle(MainVerticle::class.qualifiedName, options, context.asyncAssertSuccess())
     }
 
     /**
@@ -62,60 +68,119 @@ class MyFirstVerticleTest {
         vertx!!.close(context.asyncAssertSuccess())
     }
 
-    /**
-     * Let's ensure that our application behaves correctly.
-     *
-     * @param context the test context
-     */
     @Test
-    fun testMyApplication(context: TestContext) {
-        // This test is asynchronous, so get an async handler to inform the test when we are done.
-        val async = context.async()
+    fun generateShopVisit(context: TestContext) {
 
-        // We create a HTTP client and query our application. When we get the response we check it contains the 'Hello'
-        // message. Then, we call the `complete` method on the async handler to declare this async (and here the test) done.
-        // Notice that the assertions are made on the 'context' object and are not Junit assert. This ways it manage the
-        // async aspect of the test the right way.
-        vertx!!.createHttpClient().getNow(port!!, "localhost", "/") { response ->
-            response.handler { body ->
-                context.assertTrue(body.toString().contains("Hello"))
+        for (count in 1..300) {
+            val async = context.async()
+
+            vertx!!.createHttpClient().getNow(port!!, "localhost", "/") { response ->
+                context.assertEquals(response.statusCode(), 200)
                 async.complete()
             }
         }
     }
 
     @Test
-    fun checkThatTheIndexPageIsServed(context: TestContext) {
-        val async = context.async()
-        vertx!!.createHttpClient().getNow(port!!, "localhost", "/assets/index.html") { response ->
-            context.assertEquals(response.statusCode(), 200)
-            context.assertEquals(response.headers().get("content-type"), "text/html;charset=UTF-8")
-            response.bodyHandler { body ->
-                context.assertTrue(body.toString().contains("<title>My Whisky Collection</title>"))
-                async.complete()
-            }
-        }
-    }
-
-    @Test
-    fun checkThatWeCanAdd(context: TestContext) {
-        val async = context.async()
-        val json = Json.encodePrettily(Whisky("Jameson", "Ireland"))
-        vertx!!.createHttpClient().post(port!!, "localhost", "/api/whiskies")
-                .putHeader("content-type", "application/json")
-                .putHeader("content-length", Integer.toString(json.length))
-                .handler { response ->
-                    context.assertEquals(response.statusCode(), 201)
-                    context.assertTrue(response.headers().get("content-type").contains("application/json"))
-                    response.bodyHandler { body ->
-                        val whisky = Json.decodeValue(body.toString(), Whisky::class.java)
-                        context.assertEquals(whisky.getName(), "Jameson")
-                        context.assertEquals(whisky.getOrigin(), "Ireland")
-                        context.assertNotNull(whisky.getId())
-                        async.complete()
+    fun generateBuyWithTimer(context: TestContext) {
+        for (count in 1..30) {
+            val async = context.async()
+            val json = gson.toJson(mapOf("action" to "buy",
+                    "products" to "[ 1, 2 ]",
+                    "with_timer" to true,
+                    "in_time" to true,
+                    "price" to "150"
+            ))
+            vertx!!.createHttpClient().post(port!!, "localhost", "/buy")
+                    .putHeader("content-type", "application/json")
+                    .putHeader("content-length", Integer.toString(json.length))
+                    .handler { response ->
+                        context.assertEquals(response.statusCode(), 200)
+                        response.bodyHandler { _ ->
+                            async.complete()
+                        }
                     }
-                }
-                .write(json)
-                .end()
+                    .write(json)
+                    .end()
+        }
     }
+
+    @Test
+    fun generateBuyWithoutTimer(context: TestContext) {
+        for (count in 1..20) {
+            val async = context.async()
+            val json = gson.toJson(mapOf("action" to "buy",
+                    "products" to "[ 1, 2 ]",
+                    "with_timer" to false,
+                    "price" to "150"
+            ))
+            vertx!!.createHttpClient().post(port!!, "localhost", "/buy")
+                    .putHeader("content-type", "application/json")
+                    .putHeader("content-length", Integer.toString(json.length))
+                    .handler { response ->
+                        context.assertEquals(response.statusCode(), 200)
+                        response.bodyHandler { _ ->
+                            async.complete()
+                        }
+                    }
+                    .write(json)
+                    .end()
+        }
+    }
+
+//    /**
+//     * Let's ensure that our application behaves correctly.
+//     *
+//     * @param context the test context
+//     */
+//    @Test
+//    fun testMyApplication(context: TestContext) {
+//        // This test is asynchronous, so get an async handler to inform the test when we are done.
+//        val async = context.async()
+//
+//        // We create a HTTP client and query our application. When we get the response we check it contains the 'Hello'
+//        // message. Then, we call the `complete` method on the async handler to declare this async (and here the test) done.
+//        // Notice that the assertions are made on the 'context' object and are not Junit assert. This ways it manage the
+//        // async aspect of the test the right way.
+//        vertx!!.createHttpClient().getNow(port!!, "localhost", "/") { response ->
+//            response.bodyHandler { body ->
+//                context.assertTrue(body.toString().contains("<h1>My Book Shop</h1>"))
+//                async.complete()
+//            }
+//        }
+//    }
+//
+//    @Test
+//    fun checkThatTheIndexPageIsServed(context: TestContext) {
+//        val async = context.async()
+//        vertx!!.createHttpClient().getNow(port!!, "localhost", "/") { response ->
+//            context.assertEquals(response.statusCode(), 200)
+//            response.bodyHandler { body ->
+//                context.assertTrue(body.toString().contains("<title>My book shop</title>"))
+//                async.complete()
+//            }
+//        }
+//    }
+//
+//    @Test
+//    fun checkThatWeCanBuy(context: TestContext) {
+//        val async = context.async()
+//        val json = gson.toJson(mapOf("action" to "buy",
+//                "products" to "[ 1, 2 ]",
+//                "with_timer" to true,
+//                "in_time" to true,
+//                "price" to "150"
+//                ))
+//        vertx!!.createHttpClient().post(port!!, "localhost", "/buy")
+//                .putHeader("content-type", "application/json")
+//                .putHeader("content-length", Integer.toString(json.length))
+//                .handler { response ->
+//                    context.assertEquals(response.statusCode(), 200)
+//                    response.bodyHandler { body ->
+//                        async.complete()
+//                    }
+//                }
+//                .write(json)
+//                .end()
+//    }
 }

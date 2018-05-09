@@ -5,7 +5,7 @@ var products = new Vue({
             {
                 id: 1,
                 title: "Good Omens",
-                price: 100,
+                price: 50,
                 img_url: "/covers/goodomens.jpg",
                 description: "Good Omens is a really good book! -- Adam"
             },
@@ -15,6 +15,13 @@ var products = new Vue({
                 price: 50,
                 img_url: "/covers/humansvscomputers.jpg",
                 description: "Humans vs Computers is scary and real -- me"
+            },
+            {
+                id: 3,
+                title: "The Nature of Software Development",
+                price: 50,
+                img_url: "/covers/natureofsoftwaredev.jpeg",
+                description: "Bringing Agile down to its basics -- me"
             }
         ],
         current: 0
@@ -33,8 +40,6 @@ var products = new Vue({
             if (next > (this.products.length - 1)) {
                 next = 0;
             }
-            console.log("Next = " + next);
-            console.log("prodlen= " + this.products.length);
 
             this.current = next;
         },

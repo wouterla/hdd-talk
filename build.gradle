@@ -68,7 +68,8 @@ dependencies {
     compile "biz.paluch.logging:logstash-gelf:1.11.1"
     compile "com.google.code.gson:gson:2.7"
 
-    compile "io.vertx:vertx-unit:$vertx_version"
+    testCompile "io.vertx:vertx-unit:$vertx_version"
+    testCompile "junit:junit:4.12"
 
 //    npm npmPackage(name : 'vuejs', tag : '1.0.29')
 //    npm npmPackage(name : 'axios', tag : '0.16.2')
@@ -84,6 +85,12 @@ run {
             "--redeploy=src/**/*.*",
             "--on-redeploy=./gradlew classes"
     ]
+}
+
+test {
+    testLogging.showStandardStreams = true
+
+    systemProperty 'java.util.logging.config.file', rootProject.projectDir.toString() + "/logging.properties"
 }
 
 // Naming and packaging settings for the "shadow jar".

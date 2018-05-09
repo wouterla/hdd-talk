@@ -18,7 +18,6 @@ var cart = new Vue({
     watch: {
         products: function() {
             var timercookie = this.$cookies.get('timer');
-            console.log("Timer: " + timercookie);
             if (timercookie == "true") {
                 this.timer();
             }
@@ -26,7 +25,11 @@ var cart = new Vue({
     },
     methods: {
         buy: function() {
-            axios.post('/buy', { action: "buy", products: this.products.map(function(product) { return product.id }), with_timer: this.timer_cookie, in_time: this.in_time, price: this.price })
+            axios.post('/buy', { action: "buy",
+                products: this.products.map(function(product) { return product.id }),
+                with_timer: this.timer_cookie,
+                in_time: this.in_time,
+                price: this.price })
                 .then(function (response) {
                     console.log(response);
                 })
