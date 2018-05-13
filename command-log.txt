@@ -1,0 +1,21 @@
+brew cask install minikube
+brew install kubernetes-helm
+minikube start --memory 4096
+kubectl cluster-info
+minikube dashboard
+
+helm init
+
+# Workaround Helm issue https://github.com/kubernetes/helm/issues/3985
+kubectl -n kube-system patch deployment tiller-deploy -p '{"spec": {"template": {"spec": {"automountServiceAccountToken": true}}}}'
+
+helm install --name hdd-jenkins stable/jenkins
+
+minikube service hdd-jenkins (launch browser)
+
+cd ops
+(changed port of kibana to 30001, may not be necessary? in use for kubernetes dashboard)
+helm install --name elk-chart ./elk-demo-helm
+
+minikube service kibana
+ (go into kibana, add default filter)

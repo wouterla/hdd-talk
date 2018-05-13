@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "hdd-talk.fullname" . }}
+  labels:
+    app: {{ template "hdd-talk.name" . }}
+    chart: {{ template "hdd-talk.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ template "hdd-talk.name" . }}
+    release: {{ .Release.Name }}
