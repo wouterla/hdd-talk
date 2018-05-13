@@ -1,3 +1,9 @@
+(
+brew install gradle
+brew cask install  caskroom/cask/virtualbox caskroom/cask/virtualbox-extension-pack
+gradle wrapper
+)
+
 brew cask install minikube
 brew install kubernetes-helm
 minikube start --memory 4096
