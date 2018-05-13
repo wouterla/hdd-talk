@@ -22,12 +22,14 @@ class LoggerVerticle : AbstractVerticle() {
         consumer.handler({ message ->
             logger.info(message.body())
         })
-
-
     }
 
     fun initLogging() {
-        val inputStream = File(System.getProperty("java.util.logging.config.file")).inputStream()
+        val logfile = File(System.getProperty("java.util.logging.config.file"))
+        if (!logfile.exists()) {
+          logfile.createNewFile()
+        }
+        val inputStream = logfile.inputStream()
         LogManager.getLogManager().readConfiguration(inputStream)
     }
 

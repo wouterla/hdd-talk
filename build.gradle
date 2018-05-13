@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        kotlin_version = '1.1.51'
+        kotlin_version = '1.2.41'
         vertx_version = '3.4.2'
     }
 
@@ -45,6 +45,7 @@ task npmInstall( type : org.ysb33r.gradle.nodejs.tasks.NpmTask ) {
 apply plugin: 'kotlin'
 
 sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
 
 mainClassName = 'io.vertx.core.Launcher'
 def mainVerticleName = 'com.lagerweij.hdd.webshop.MainVerticle'
@@ -58,15 +59,18 @@ repositories {
     }
 }
 dependencies {
+
     compile "io.vertx:vertx-core:$vertx_version"
     compile "io.vertx:vertx-web:$vertx_version"
 
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile "org.jetbrains.kotlin:kotlin-runtime:$kotlin_version"
     compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 
     compile "biz.paluch.logging:logstash-gelf:1.11.1"
     compile "com.google.code.gson:gson:2.7"
+    compile "com.fasterxml.jackson.core:jackson-core:2.9.5"
+    compile "com.fasterxml.jackson.core:jackson-databind:2.9.5"
 
     testCompile "io.vertx:vertx-unit:$vertx_version"
     testCompile "junit:junit:4.12"
@@ -104,6 +108,12 @@ shadowJar {
     mergeServiceFiles {
         include 'META-INF/services/io.vertx.core.spi.VerticleFactory'
     }
+    into 'webroot', {
+		  from 'webroot'
+	  }
+    into 'node_modules', {
+      from 'node_modules'
+    }
 }
 
 task wrapper(type: Wrapper) {
@@ -113,4 +123,109 @@ task wrapper(type: Wrapper) {
 // Heroku relies on the 'stage' task to deploy.
 task stage {
     dependsOn shadowJar
+}
+
+task buildImage(type: Exec) {
+    dependsOn shadowJar
+
+    workingDir '.'
+    commandLine 'docker', 'build', '-t', 'wouterla/hdd-talk', '.'
+}
+
+task stopContainer(type: Exec) {
+    ignoreExitValue = true
+
+    workingDir '.'
+    commandLine 'docker', 'rm', '-f', 'hdd-talk'
+}
+
+task startContainer(type: Exec) {
+    dependsOn buildImage
+    dependsOn stopContainer
+
+    workingDir '.'
+    commandLine 'docker', 'run', '-d', '-p', '8080:8080', '--name', 'hdd-talk', 'wouterla/hdd-talk'
+}
+
+task publishImage(type: Exec) {
+    dependsOn buildImage
+
+    workingDir '.'
+    commandLine 'docker', 'push', 'wouterla/hdd-talk'
+}
+
+task startMinikube(type: Exec) {
+    workingDir '.'
+    commandLine 'minikube', 'start', '--memory', '4096'
+}
+
+task initHelm(type: Exec) {
+  mustRunAfter startMinikube
+  commandLine 'helm', 'init'
+}
+
+task fixHelmConfig(type: Exec) {
+  mustRunAfter initHelm
+  commandLine 'kubectl', '-n', 'kube-system', 'patch', 'deployment', 'tiller-deploy', '-p', '{"spec": {"template": {"spec": {"automountServiceAccountToken": true}}}}'
+}
+
+task startJenkins(type: Exec) {
+  mustRunAfter fixHelmConfig
+  mustRunAfter initHelm
+  commandLine 'helm', 'install', '--name', 'hdd-jenkins', 'stable/jenkins'
+}
+
+task showJenkinsPassword(type: Exec) {
+  mustRunAfter startJenkins
+
+  commandLine 'bash', '-c', 'printf $(kubectl get secret --namespace default hdd-jenkins -o jsonpath="{.data.jenkins-admin-password}" | base64 --decode);echo'
+}
+
+task openJenkins(type: Exec) {
+  mustRunAfter startJenkins
+
+  commandLine 'minikube', 'service', 'hdd-jenkins'
+}
+
+task startELK(type: Exec) {
+  mustRunAfter fixHelmConfig
+  mustRunAfter initHelm
+
+  workingDir './ops'
+  commandLine 'helm', 'install', '--name', 'elk', './elk-demo-helm'
+}
+
+task openKibana(type: Exec) {
+  mustRunAfter startELK
+
+  commandLine 'minikube', 'service', 'kibana'
+}
+
+task startCluster() {
+  dependsOn startMinikube
+  dependsOn initHelm
+  dependsOn fixHelmConfig
+  dependsOn startELK
+  dependsOn startJenkins
+  dependsOn showJenkinsPassword
+}
+
+task undeploy(type: Exec) {
+  dependsOn publishImage
+  ignoreExitValue = true
+
+  commandLine 'helm', 'delete', '--purge', 'hdd-talk'
+}
+
+task deploy(type: Exec) {
+  dependsOn undeploy
+
+  workingDir './ops'
+  commandLine 'helm', 'install', '--name', 'hdd-talk', './hdd-talk'
+}
+
+task openBookshop(type: Exec) {
+  mustRunAfter deploy
+
+  commandLine 'minikube', 'service', 'hdd-talk'
 }
