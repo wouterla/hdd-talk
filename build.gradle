@@ -205,6 +205,9 @@ task startCluster() {
   dependsOn startMinikube
   dependsOn initHelm
   dependsOn fixHelmConfig
+}
+
+task startBaseComponents() {
   dependsOn startELK
   dependsOn startJenkins
   dependsOn showJenkinsPassword

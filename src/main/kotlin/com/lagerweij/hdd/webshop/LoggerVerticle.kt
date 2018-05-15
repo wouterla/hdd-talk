@@ -6,11 +6,14 @@ import io.vertx.core.DeploymentOptions
 import java.io.File
 import java.util.logging.LogManager
 import java.util.logging.Logger
+import java.util.logging.Level
 import io.vertx.core.eventbus.MessageConsumer
+import com.google.gson.Gson
 
 @Suppress("unused")
 class LoggerVerticle : AbstractVerticle() {
 
+    private val gson = Gson()
     private val logger : Logger = Logger.getLogger(LoggerVerticle::class.simpleName)
 
     override fun start(startFuture: Future<Void>?) {
@@ -20,7 +23,8 @@ class LoggerVerticle : AbstractVerticle() {
 
         val consumer: MessageConsumer<String> = eb.consumer("logger")
         consumer.handler({ message ->
-            logger.info(message.body())
+            val msgObj = gson.fromJson(message.body(), MsgObj::class.java)
+            logger.log(Level.INFO, message.body(), msgObj.values)
         })
     }
 
