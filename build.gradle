@@ -214,13 +214,13 @@ task startBaseComponents() {
 }
 
 task undeploy(type: Exec) {
-  dependsOn publishImage
   ignoreExitValue = true
 
   commandLine 'helm', 'delete', '--purge', 'hdd-talk'
 }
 
 task deploy(type: Exec) {
+  dependsOn publishImage
   dependsOn undeploy
 
   workingDir './ops'

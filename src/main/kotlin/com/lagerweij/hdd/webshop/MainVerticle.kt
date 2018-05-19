@@ -10,10 +10,12 @@ import io.vertx.ext.web.RoutingContext
 import io.vertx.ext.web.handler.BodyHandler
 import io.vertx.ext.web.handler.CookieHandler
 import io.vertx.ext.web.handler.StaticHandler
+import com.lagerweij.logging.MsgObj
 
 @Suppress("unused")
 class MainVerticle : AbstractVerticle() {
     lateinit var logger: Logger
+    private val gson = Gson()
 
     override fun start(startFuture: Future<Void>?) {
         logger = Logger(vertx.eventBus())
@@ -65,15 +67,15 @@ class MainVerticle : AbstractVerticle() {
 
     val handlerRoot = Handler<RoutingContext> { req ->
 
-        logger.logJson(mapOf("action" to "shop",
-                "cookie-value" to getCookieValue(req, "timer")))
+        logger.log(MsgObj(action = "shop", cookieValue = getCookieValue(req, "timer")))
 
         req.response().sendFile("webroot/shop.html")
     }
 
     val handlerBuyButton = Handler<RoutingContext> { req ->
         var jsonData = req.bodyAsJson
-        logger.log( jsonData.encode() )
+        val msgObj = gson.fromJson(jsonData.encode(), MsgObj::class.java)
+        logger.log( msgObj )
 
         // Here, we could actually do something
 

@@ -4,6 +4,8 @@ import com.google.gson.Gson
 import io.vertx.ext.web.Cookie
 import io.vertx.ext.web.RoutingContext
 import java.util.*
+import com.lagerweij.logging.MsgObj
+
 
 data class Toggle(val name: String, val percentage: Int)
 
@@ -37,19 +39,19 @@ class FeatureToggle(logger: Logger) {
             if (isSet(context.cookies(), toggleName)) {
 
                 // Just log if the cookie is already set
-                logger.logJson(mapOf("action" to "existing-cookie",
-                        "cookie-name" to "timer",
-                        "cookie-value" to "${isOn(context.cookies(), toggleName)}",
-                        "cookie-statue" to "passed-in"))
+                logger.log(MsgObj(action = "existing-cookie",
+                        cookieName = "timer",
+                        cookieValue = "${isOn(context.cookies(), toggleName)}",
+                        cookieStatus = "passed-in"))
             } else {
                 // Get a value for the cookie, then set it in the session and log what we did
                 val toggleValue = generateToggleValue("timer")
                 val newCookie = Cookie.cookie(toggleName, "${toggleValue}")
                 context.addCookie(newCookie)
-                logger.logJson(mapOf("action" to "set-cookie",
-                        "cookie-name" to newCookie.name,
-                        "cookie-value" to newCookie.value,
-                        "cookie-statue" to "set"))
+                logger.log(MsgObj(action = "set-cookie",
+                        cookieName = newCookie.name,
+                        cookieValue = newCookie.value,
+                        cookieStatus = "set"))
             }
         }
     }

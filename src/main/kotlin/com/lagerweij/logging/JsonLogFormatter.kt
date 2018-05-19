@@ -1,7 +1,5 @@
 package com.lagerweij.logging
 
-/* import com.fasterxml.jackson.core.JsonProcessingException
-import com.fasterxml.jackson.databind.ObjectMapper */
 import com.google.gson.Gson
 import java.util.logging.ConsoleHandler
 import java.util.logging.Formatter
@@ -18,21 +16,20 @@ class JsonLogFormatter : Formatter() {
   private val gson = Gson()
   val timeFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
 
-  data class LogObject(val log: String, val stream: String, val time: String, val values: Any)
-
   override public fun format(record: LogRecord): String {
 
     val time = Date(record.millis)
     val timeString = timeFormat.format(time)
-    var values = record.getParameters()
+    var params = record.getParameters()
+    var jsonInString: String?
 
-    if (values == null) {
-      values = emptyArray<String>()
+    if (params != null && params.get(0) != null) {
+      var msgObj = params.get(0) as MsgObj
+      msgObj.time = timeString
+      jsonInString = gson.toJson(msgObj)
+    } else {
+      jsonInString = record.message
     }
-    val logObject = LogObject(record.message, "webshop.log", timeString, values)
-
-    var jsonInString = gson.toJson(logObject)
-
     jsonInString += "\n"
 
     return jsonInString
