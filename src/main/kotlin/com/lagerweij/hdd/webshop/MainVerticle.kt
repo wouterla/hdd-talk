@@ -67,15 +67,24 @@ class MainVerticle : AbstractVerticle() {
 
     val handlerRoot = Handler<RoutingContext> { req ->
 
-        logger.log(MsgObj(action = "shop", cookieValue = getCookieValue(req, "timer")))
+        val msgObj = MsgObj(action = "shop")
+        msgObj.cookieValue = getCookieValue(req, "timer") as String
+        logger.log(msgObj)
 
         req.response().sendFile("webroot/shop.html")
     }
 
     val handlerBuyButton = Handler<RoutingContext> { req ->
         var jsonData = req.bodyAsJson
-        val msgObj = gson.fromJson(jsonData.encode(), MsgObj::class.java)
-        logger.log( msgObj )
+        try {
+          var msgObj = gson.fromJson(jsonData.encode(), MsgObj::class.java)
+          msgObj.cookieName = "timer"
+          msgObj.cookieValue = getCookieValue(req, "timer") as String
+
+          logger.log( msgObj )
+        } catch (e: Exception) {
+            logger.log("Exception buying: " + e.toString())
+        }
 
         // Here, we could actually do something
 

@@ -24,8 +24,12 @@ class LoggerVerticle : AbstractVerticle() {
 
         val consumer: MessageConsumer<String> = eb.consumer("logger")
         consumer.handler({ message ->
-            val msgObj = gson.fromJson(message.body(), MsgObj::class.java)
-            logger.log(Level.INFO, message.body(), msgObj)
+            try {
+              val msgObj = gson.fromJson(message.body(), MsgObj::class.java)
+              logger.log(Level.INFO, message.body(), msgObj)
+            } catch (e: Exception) {
+              logger.log(Level.INFO, "Exception deserialisting msgObj: " + e.toString())
+            }
         })
     }
 

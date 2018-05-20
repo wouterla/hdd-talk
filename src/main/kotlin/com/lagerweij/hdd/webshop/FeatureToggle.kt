@@ -39,19 +39,21 @@ class FeatureToggle(logger: Logger) {
             if (isSet(context.cookies(), toggleName)) {
 
                 // Just log if the cookie is already set
-                logger.log(MsgObj(action = "existing-cookie",
-                        cookieName = "timer",
-                        cookieValue = "${isOn(context.cookies(), toggleName)}",
-                        cookieStatus = "passed-in"))
+                var msgObj = MsgObj(action = "existing-cookie")
+                msgObj.cookieName = "timer"
+                msgObj.cookieValue = "${isOn(context.cookies(), toggleName)}"
+                msgObj.cookieStatus = "passed-in"
+                logger.log(msgObj)
             } else {
                 // Get a value for the cookie, then set it in the session and log what we did
                 val toggleValue = generateToggleValue("timer")
                 val newCookie = Cookie.cookie(toggleName, "${toggleValue}")
                 context.addCookie(newCookie)
-                logger.log(MsgObj(action = "set-cookie",
-                        cookieName = newCookie.name,
-                        cookieValue = newCookie.value,
-                        cookieStatus = "set"))
+                var msgObj = MsgObj(action = "set-cookie")
+                msgObj.cookieName = newCookie.name
+                msgObj.cookieValue = newCookie.value
+                msgObj.cookieStatus = "set"
+                logger.log(msgObj)
             }
         }
     }

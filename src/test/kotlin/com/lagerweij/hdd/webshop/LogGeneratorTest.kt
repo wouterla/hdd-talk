@@ -21,10 +21,11 @@ import java.net.ServerSocket
  * This is our JUnit test for our verticle. The test uses vertx-unit, so we declare a custom runner.
  */
 @RunWith(VertxUnitRunner::class)
-class MyFirstVerticleTest {
+class LogGeneratorTest {
 
     private var vertx: Vertx? = null
     private var port: Int? = null
+    private var host: String? = null
 
     private val gson = Gson()
 
@@ -38,24 +39,33 @@ class MyFirstVerticleTest {
      *
      * @param context the test context.
      */
-    @Before
+    /* @Before
     @Throws(IOException::class)
     fun setUp(context: TestContext) {
+
+      var definedHost: String? = System.getenv("test.host") ?: null
+      var definedPort: String? = System.getenv("test.port") ?: null
+      if (definedPort != null) {
+        host = definedHost
+        port = definedPort.toInt()
+      } else {
+        host = "localhost"
+
+        val socket = ServerSocket(0)
+        port = socket.localPort
+        socket.close()
 
         vertx = Vertx.vertx()
 
         // Let's configure the verticle to listen on the 'test' port (randomly picked).
         // We create deployment options and set the _configuration_ json object:
-        val socket = ServerSocket(0)
-        port = socket.localPort
-        socket.close()
 
         val options = DeploymentOptions()
-                .setConfig(JsonObject().put("http.port", port)
-                )
+          .setConfig(JsonObject().put("http.port", port))
 
         // We pass the options as the second parameter of the deployVerticle method.
         vertx!!.deployVerticle(MainVerticle::class.qualifiedName, options, context.asyncAssertSuccess())
+      }
     }
 
     /**
@@ -74,7 +84,7 @@ class MyFirstVerticleTest {
         for (count in 1..300) {
             val async = context.async()
 
-            vertx!!.createHttpClient().getNow(port!!, "localhost", "/") { response ->
+            vertx!!.createHttpClient().getNow(port!!, host, "/") { response ->
                 context.assertEquals(response.statusCode(), 200)
                 async.complete()
             }
@@ -86,12 +96,12 @@ class MyFirstVerticleTest {
         for (count in 1..30) {
             val async = context.async()
             val json = gson.toJson(mapOf("action" to "buy",
-                    "products" to "[ 1, 2 ]",
+                    "products" to listOf(1, 2),
                     "with_timer" to true,
                     "in_time" to true,
                     "price" to "150"
             ))
-            vertx!!.createHttpClient().post(port!!, "localhost", "/buy")
+            vertx!!.createHttpClient().post(port!!, host, "/buy")
                     .putHeader("content-type", "application/json")
                     .putHeader("content-length", Integer.toString(json.length))
                     .handler { response ->
@@ -110,7 +120,7 @@ class MyFirstVerticleTest {
         for (count in 1..20) {
             val async = context.async()
             val json = gson.toJson(mapOf("action" to "buy",
-                    "products" to "[ 1, 2 ]",
+                    "products" to listOf(1, 2),
                     "with_timer" to false,
                     "price" to "150"
             ))
@@ -126,7 +136,7 @@ class MyFirstVerticleTest {
                     .write(json)
                     .end()
         }
-    }
+    } */
 
 //    /**
 //     * Let's ensure that our application behaves correctly.
