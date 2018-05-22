@@ -76,7 +76,7 @@ dependencies {
     testCompile "junit:junit:4.12"
     testCompile "com.jayway.restassured:rest-assured:2.4.0"
     testCompile "org.assertj:assertj-core:2.0.0"
-    
+
 //    npm npmPackage(name : 'vuejs', tag : '1.0.29')
 //    npm npmPackage(name : 'axios', tag : '0.16.2')
 }
@@ -86,7 +86,7 @@ run {
     jvmArgs = [ "-Dtestprop=testval3" ]
     systemProperty("testprop", "testval2")
     args = [ 'run', mainVerticleName,
-            "-Djava.util.logging.config.file=" + rootProject.projectDir + "/logging.properties",
+            "-Djava.util.logging.config.file=" + rootProject.projectDir + "/local_logging.properties",
             "--launcher-class=$mainClassName",
             "--redeploy=src/**/*.*",
             "--on-redeploy=./gradlew classes"
