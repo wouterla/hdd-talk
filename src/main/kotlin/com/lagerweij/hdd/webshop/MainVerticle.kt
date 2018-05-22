@@ -51,6 +51,7 @@ class MainVerticle : AbstractVerticle() {
         route().handler(handlerCookieFeatureToggle)
 
         get("/").handler(handlerRoot)
+        get("/status").handler(statusHandler)
 
         route("/buy").handler(BodyHandler.create())
         post("/buy").handler(handlerBuyButton)
@@ -63,6 +64,10 @@ class MainVerticle : AbstractVerticle() {
         toggles.handleFeatureToggles(context)
 
         context.next()
+    }
+
+    val statusHandler = Handler<RoutingContext> { req ->
+      req.response().end()
     }
 
     val handlerRoot = Handler<RoutingContext> { req ->
