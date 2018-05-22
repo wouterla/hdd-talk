@@ -4,7 +4,7 @@ import com.google.gson.Gson
 import io.vertx.ext.web.Cookie
 import io.vertx.ext.web.RoutingContext
 import java.util.*
-import com.lagerweij.logging.MsgObj
+import com.lagerweij.logging.*
 
 
 data class Toggle(val name: String, val percentage: Int)
@@ -14,7 +14,7 @@ class FeatureToggle(logger: Logger) {
 
     private val gson = Gson()
 
-    private val toggles = mapOf<String, Toggle>("timer" to Toggle("timer", 50))
+    val toggles = mapOf<String, Toggle>("timer" to Toggle("timer", 50))
 
     fun isOn(cookies: Set<Cookie>, name: String) : Boolean? {
         val cookieMap : Map<String, Boolean?> = cookies.associateBy( { it.name }, { java.lang.Boolean.parseBoolean(it.value) })
@@ -40,7 +40,7 @@ class FeatureToggle(logger: Logger) {
 
                 // Just log if the cookie is already set
                 var msgObj = MsgObj(action = "existing-cookie")
-                msgObj.cookieName = "timer"
+                msgObj.cookieName = toggleName
                 msgObj.cookieValue = "${isOn(context.cookies(), toggleName)}"
                 msgObj.cookieStatus = "passed-in"
                 logger.log(msgObj)

@@ -11,17 +11,21 @@ import io.vertx.ext.web.handler.BodyHandler
 import io.vertx.ext.web.handler.CookieHandler
 import io.vertx.ext.web.handler.StaticHandler
 import com.lagerweij.logging.MsgObj
+import com.lagerweij.logging.Logger
 
 @Suppress("unused")
 class MainVerticle : AbstractVerticle() {
     lateinit var logger: Logger
+    lateinit var toggles: FeatureToggle
+
     private val gson = Gson()
 
     override fun start(startFuture: Future<Void>?) {
         logger = Logger(vertx.eventBus())
+        toggles = FeatureToggle(logger)
 
         val options = DeploymentOptions().setWorker(true)
-        vertx.deployVerticle("com.lagerweij.hdd.webshop.LoggerVerticle", options) { res ->
+        vertx.deployVerticle("com.lagerweij.logging.LoggerVerticle", options) { res ->
             if (res.succeeded()) {
                 startFuture!!.complete()
             } else {
@@ -50,8 +54,9 @@ class MainVerticle : AbstractVerticle() {
         route().handler(CookieHandler.create())
         route().handler(handlerCookieFeatureToggle)
 
-        get("/").handler(handlerRoot)
         get("/status").handler(statusHandler)
+
+        get("/").handler(handlerRoot)
 
         route("/buy").handler(BodyHandler.create())
         post("/buy").handler(handlerBuyButton)
@@ -59,7 +64,6 @@ class MainVerticle : AbstractVerticle() {
 
     // Handlers
     val handlerCookieFeatureToggle = Handler<RoutingContext> { context ->
-        val toggles = FeatureToggle(logger)
 
         toggles.handleFeatureToggles(context)
 
@@ -81,6 +85,7 @@ class MainVerticle : AbstractVerticle() {
 
     val handlerBuyButton = Handler<RoutingContext> { req ->
         var jsonData = req.bodyAsJson
+
         try {
           var msgObj = gson.fromJson(jsonData.encode(), MsgObj::class.java)
           msgObj.cookieName = "timer"
@@ -91,12 +96,12 @@ class MainVerticle : AbstractVerticle() {
             logger.log("Exception buying: " + e.toString())
         }
 
-        // Here, we could actually do something
+        // Here, we could actually do something to make money!
 
         req.response().end()
     }
 
-    // Utilities
+    // Utility methods
     /**
      * Extension to the HTTP response to output JSON objects.
      */
@@ -111,5 +116,4 @@ class MainVerticle : AbstractVerticle() {
         }
         return null
     }
-
 }

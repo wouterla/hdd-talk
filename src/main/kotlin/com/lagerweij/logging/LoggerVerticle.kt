@@ -1,4 +1,4 @@
-package com.lagerweij.hdd.webshop
+package com.lagerweij.logging
 
 import io.vertx.core.AbstractVerticle
 import io.vertx.core.Future
@@ -9,7 +9,6 @@ import java.util.logging.Logger
 import java.util.logging.Level
 import io.vertx.core.eventbus.MessageConsumer
 import com.google.gson.Gson
-import com.lagerweij.logging.MsgObj
 
 @Suppress("unused")
 class LoggerVerticle : AbstractVerticle() {

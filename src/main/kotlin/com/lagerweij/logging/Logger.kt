@@ -1,8 +1,7 @@
-package com.lagerweij.hdd.webshop
+package com.lagerweij.logging
 
 import com.google.gson.Gson
 import io.vertx.core.eventbus.EventBus
-import com.lagerweij.logging.MsgObj
 
 class Logger(eventBus: EventBus) {
 
