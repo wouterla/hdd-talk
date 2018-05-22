@@ -14,7 +14,13 @@ class FeatureToggle(logger: Logger) {
 
     private val gson = Gson()
 
-    val toggles = mapOf<String, Toggle>("timer" to Toggle("timer", 50))
+    /* val toggles = mapOf<String, Toggle>("timer" to Toggle("timer", 50)) */
+    val toggles = HashMap<String, Toggle>()
+
+    fun addToggle(name: String, percentage: Int) {
+      val newToggle = Toggle(name, percentage)
+      toggles[name] = newToggle
+    }
 
     fun isOn(cookies: Set<Cookie>, name: String) : Boolean? {
         val cookieMap : Map<String, Boolean?> = cookies.associateBy( { it.name }, { java.lang.Boolean.parseBoolean(it.value) })

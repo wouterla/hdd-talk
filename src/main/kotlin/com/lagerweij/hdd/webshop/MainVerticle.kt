@@ -23,6 +23,8 @@ class MainVerticle : AbstractVerticle() {
     override fun start(startFuture: Future<Void>?) {
         logger = Logger(vertx.eventBus())
         toggles = FeatureToggle(logger)
+        
+        toggles.addToggle("timer", 50)
 
         val options = DeploymentOptions().setWorker(true)
         vertx.deployVerticle("com.lagerweij.logging.LoggerVerticle", options) { res ->
@@ -82,10 +84,7 @@ class MainVerticle : AbstractVerticle() {
     }
 
     val handlerRoot = Handler<RoutingContext> { req ->
-
-        val msgObj = MsgObj(action = "shop")
-        msgObj.cookieValue = getCookieValue(req, "timer") as String
-        logger.log(msgObj)
+        logAction(req, "shop", null)
 
         req.response().sendFile("webroot/shop.html")
     }
@@ -94,11 +93,7 @@ class MainVerticle : AbstractVerticle() {
         var jsonData = req.bodyAsJson
 
         try {
-          var msgObj = gson.fromJson(jsonData.encode(), MsgObj::class.java)
-          msgObj.cookieName = "timer"
-          msgObj.cookieValue = getCookieValue(req, "timer") as String
-
-          logger.log( msgObj )
+          logAction(req, "buy", jsonData.encode())
         } catch (e: Exception) {
             logger.log("Exception buying: " + e.toString())
         }
@@ -122,5 +117,22 @@ class MainVerticle : AbstractVerticle() {
             return someCookie.value
         }
         return null
+    }
+
+    private fun logAction(req: RoutingContext, logAction: String, clientMsg: String?) {
+      var msgObj: MsgObj
+      if (clientMsg != null) {
+        msgObj = gson.fromJson(clientMsg, MsgObj::class.java)
+      } else {
+        msgObj = MsgObj(action = logAction)
+      }
+
+      toggles.toggles.forEach() { _, definedToggle ->
+        if (toggles.isSet(req.cookies(), definedToggle.name)) {
+          msgObj.cookieName = definedToggle.name
+          msgObj.cookieValue = getCookieValue(req, definedToggle.name) as String
+        }
+      }
+      logger.log( msgObj )
     }
 }
