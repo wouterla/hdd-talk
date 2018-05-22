@@ -45,10 +45,12 @@ class FeatureToggle(logger: Logger) {
                 msgObj.cookieStatus = "passed-in"
                 logger.log(msgObj)
             } else {
-                // Get a value for the cookie, then set it in the session and log what we did
+                // Get a value for the cookie, then set it in the session
                 val toggleValue = generateToggleValue("timer")
                 val newCookie = Cookie.cookie(toggleName, "${toggleValue}")
                 context.addCookie(newCookie)
+
+                // log that we set the cookie
                 var msgObj = MsgObj(action = "set-cookie")
                 msgObj.cookieName = newCookie.name
                 msgObj.cookieValue = newCookie.value
