@@ -95,9 +95,11 @@ run {
 }
 
 test {
-    testLogging.showStandardStreams = true
+  systemProperties System.getProperties()
 
-    systemProperty 'java.util.logging.config.file', rootProject.projectDir.toString() + "/local_logging.properties"
+  testLogging.showStandardStreams = true
+
+  systemProperty 'java.util.logging.config.file', rootProject.projectDir.toString() + "/local_logging.properties"
 }
 
 // Naming and packaging settings for the "shadow jar".

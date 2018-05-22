@@ -40,8 +40,18 @@ class LogGeneratorIntegrationTest {
         port = definedPort.toInt();
       } */
 
+      var portProperty = System.getProperty("test.port")
+      if (portProperty != null) {
+        port = portProperty.toInt()
+      }
+      var hostProperty = System.getProperty("test.host")
+      if (hostProperty != null) {
+        host = hostProperty
+      }
+
       RestAssured.baseURI = "http://" + host;
       RestAssured.port = port;
+      println("Testing on: " + host + ":" + port)
     }
 
     @AfterClass @JvmStatic
