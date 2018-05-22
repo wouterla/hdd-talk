@@ -84,9 +84,10 @@ dependencies {
 // Redeploy watcher.
 run {
     jvmArgs = [ "-Dtestprop=testval3" ]
-    systemProperty("testprop", "testval2")
+    // systemProperty("vertx.port", "9090")
     args = [ 'run', mainVerticleName,
             "-Djava.util.logging.config.file=" + rootProject.projectDir + "/local_logging.properties",
+            "-Dvertx.port=9090",
             "--launcher-class=$mainClassName",
             "--redeploy=src/**/*.*",
             "--on-redeploy=./gradlew classes"
