@@ -25,7 +25,7 @@ var cart = new Vue({
     },
     methods: {
         buy: function() {
-            axios.post('/buy', §{ action: "buy",
+            axios.post('/buy', { action: "buy",
                 products: this.products.map(function(product) { return product.id }),
                 with_timer: this.timer_cookie,
                 in_time: this.in_time,
