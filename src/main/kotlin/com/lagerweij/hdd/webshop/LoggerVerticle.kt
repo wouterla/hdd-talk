@@ -35,11 +35,10 @@ class LoggerVerticle : AbstractVerticle() {
 
     fun initLogging() {
         val logfile = File(System.getProperty("java.util.logging.config.file"))
-        if (!logfile.exists()) {
-          logfile.createNewFile()
+        if (logfile.exists()) {
+          val inputStream = logfile.inputStream()
+          LogManager.getLogManager().readConfiguration(inputStream)
         }
-        val inputStream = logfile.inputStream()
-        LogManager.getLogManager().readConfiguration(inputStream)
     }
 
 }
