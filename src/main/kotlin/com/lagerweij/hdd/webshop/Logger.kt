@@ -16,28 +16,8 @@ class Logger(eventBus: EventBus) {
         eventBus.send("logger", message)
     }
 
-    fun log(values: Map<String, String?>) {
-        eventBus.send("logger", values)
-    }
-
     fun log(msgObj: MsgObj) {
       eventBus.send("logger", gson.toJson(msgObj))
-    }
-
-    /* fun logMap(logMap: Map<String, String?>) {
-        val obj = MsgObj(logMap)
-        log(gson.toJson(obj))
-    } */
-
-    fun logJson(json: String) {
-        log(json)
-        try {
-          val containedString = "{\"values\":" + json + "}"
-          val obj = gson.fromJson(containedString, MsgObj::class.java)
-          log(gson.toJson(obj))
-        } catch (exception: Exception) {
-          log(exception.toString())
-        }
     }
 
 }
