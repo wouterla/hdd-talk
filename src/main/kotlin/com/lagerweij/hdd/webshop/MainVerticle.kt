@@ -26,14 +26,7 @@ class MainVerticle : AbstractVerticle() {
 
       toggles.addToggle("timer", 50)
 
-      val options = DeploymentOptions().setWorker(true)
-      vertx.deployVerticle("com.lagerweij.logging.LoggerVerticle", options) { res ->
-        if (res.succeeded()) {
-            startFuture!!.complete()
-        } else {
-            startFuture!!.fail(res.cause())
-        }
-      }
+      startLoggingVerticle(startFuture)
 
       val router = createRouter()
       router.route().handler(StaticHandler.create())
@@ -133,5 +126,16 @@ class MainVerticle : AbstractVerticle() {
         }
       }
       logger.log( msgObj )
+    }
+
+    private fun startLoggingVerticle(startFuture: Future<Void>?) {
+      val options = DeploymentOptions().setWorker(true)
+      vertx.deployVerticle("com.lagerweij.logging.LoggerVerticle", options) { res ->
+        if (res.succeeded()) {
+            startFuture!!.complete()
+        } else {
+            startFuture!!.fail(res.cause())
+        }
+      }
     }
 }
