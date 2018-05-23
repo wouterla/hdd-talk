@@ -21,14 +21,13 @@ class MainVerticle : AbstractVerticle() {
     private val gson = Gson()
 
     override fun start(startFuture: Future<Void>?) {
+      startLoggingVerticle(startFuture)
       logger = Logger(vertx.eventBus())
+
+      startHttpServer(startFuture)
 
       toggles = FeatureToggle(logger)
       toggles.addToggle("timer", 50)
-
-      startLoggingVerticle(startFuture)
-
-      startHttpServer(startFuture)
     }
 
     private fun createRouter() = Router.router(vertx).apply {
