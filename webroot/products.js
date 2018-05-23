@@ -2,27 +2,27 @@ var products = new Vue({
     el: '#products',
     data: {
         products: [
-            {
-                id: 1,
-                title: "Good Omens",
-                price: 50,
-                img_url: "/covers/goodomens.jpg",
-                description: "Good Omens is a really good book! -- Adam"
-            },
-            {
-                id: 2,
-                title: "Humans vs Computers",
-                price: 50,
-                img_url: "/covers/humansvscomputers.jpg",
-                description: "Humans vs Computers is scary and real -- me"
-            },
-            {
-                id: 3,
-                title: "The Nature of Software Development",
-                price: 50,
-                img_url: "/covers/natureofsoftwaredev.jpeg",
-                description: "Bringing Agile down to its basics -- me"
-            }
+          {
+              id: 1,
+              title: "The Nature of Software Development",
+              price: 50,
+              img_url: "/covers/natureofsoftwaredev.jpeg",
+              description: "Bringing Agile down to its basics -- me"
+          },
+          {
+              id: 2,
+              title: "Good Omens",
+              price: 50,
+              img_url: "/covers/goodomens.jpg",
+              description: "Good Omens is a really good book! -- Adam"
+          },
+          {
+              id: 3,
+              title: "Humans vs Computers",
+              price: 50,
+              img_url: "/covers/humansvscomputers.jpg",
+              description: "Humans vs Computers is scary and real -- me"
+          }
         ],
         current: 0
     },

@@ -22,31 +22,13 @@ class MainVerticle : AbstractVerticle() {
 
     override fun start(startFuture: Future<Void>?) {
       logger = Logger(vertx.eventBus())
-      toggles = FeatureToggle(logger)
 
+      toggles = FeatureToggle(logger)
       toggles.addToggle("timer", 50)
 
       startLoggingVerticle(startFuture)
 
-      val router = createRouter()
-      router.route().handler(StaticHandler.create())
-
-      var port = 8080
-      var portProperty = System.getProperty("vertx.port")
-      if (portProperty != null) {
-        port = portProperty.toInt()
-      }
-      println("Starting on port: " + port)
-
-      vertx.createHttpServer()
-        .requestHandler { router.accept(it) }
-        .listen(config().getInteger("http.port", port)) { result ->
-          if (result.succeeded()) {
-              startFuture?.complete()
-          } else {
-              startFuture?.fail(result.cause())
-          }
-        }
+      startHttpServer(startFuture)
     }
 
     private fun createRouter() = Router.router(vertx).apply {
@@ -137,5 +119,28 @@ class MainVerticle : AbstractVerticle() {
             startFuture!!.fail(res.cause())
         }
       }
+    }
+
+    private fun startHttpServer(startFuture: Future<Void>?) {
+
+      val router = createRouter()
+      router.route().handler(StaticHandler.create())
+
+      var port = 8080
+      var portProperty = System.getProperty("vertx.port")
+      if (portProperty != null) {
+        port = portProperty.toInt()
+      }
+      println("Starting on port: " + port)
+
+      vertx.createHttpServer()
+        .requestHandler { router.accept(it) }
+        .listen(config().getInteger("http.port", port)) { result ->
+          if (result.succeeded()) {
+              startFuture?.complete()
+          } else {
+              startFuture?.fail(result.cause())
+          }
+        }
     }
 }
