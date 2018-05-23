@@ -73,7 +73,7 @@ class LogGeneratorIntegrationTest {
 
   @Test
   fun generateBuyWithTimer() {
-    for (count in 1..75) {
+    for (count in 1..50) {
       val json = gson.toJson(mapOf("action" to "buy",
         "products" to listOf(1, 2),
         "with_timer" to true,
@@ -86,7 +86,7 @@ class LogGeneratorIntegrationTest {
 
   @Test
   fun generateBuyWithoutTimer() {
-    for (count in 1..10) {
+    for (count in 1..20) {
       val json = gson.toJson(mapOf("action" to "buy",
               "products" to listOf(1, 2),
               "with_timer" to false,
