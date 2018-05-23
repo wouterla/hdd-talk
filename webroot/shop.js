@@ -47,16 +47,16 @@ var cart = new Vue({
             var counter = 10;
 
             var countdown = setInterval(function() {
-                cart.buytext = 'Buy with discount, ' + counter + ' seconds left';
+                cart.buytext = 'Buy now! ' + counter + ' seconds left';
                 counter--;
                 if (counter < 0) {
                     clearInterval(countdown);
-                    cart.reset();
                     cart.discount = 0;
+                    cart.setCartTexts();
                 }
             }, 1000);
         },
-        reset: function() {
+        setCartTexts: function() {
             cart.buytext = 'Buy';
             cart.added_text = 'Buy this book!';
         }

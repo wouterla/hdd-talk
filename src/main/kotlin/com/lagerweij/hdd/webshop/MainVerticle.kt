@@ -21,62 +21,61 @@ class MainVerticle : AbstractVerticle() {
     private val gson = Gson()
 
     override fun start(startFuture: Future<Void>?) {
-        logger = Logger(vertx.eventBus())
-        toggles = FeatureToggle(logger)
-        
-        toggles.addToggle("timer", 50)
+      logger = Logger(vertx.eventBus())
+      toggles = FeatureToggle(logger)
 
-        val options = DeploymentOptions().setWorker(true)
-        vertx.deployVerticle("com.lagerweij.logging.LoggerVerticle", options) { res ->
-            if (res.succeeded()) {
-                startFuture!!.complete()
-            } else {
-                startFuture!!.fail(res.cause())
-            }
+      toggles.addToggle("timer", 50)
+
+      val options = DeploymentOptions().setWorker(true)
+      vertx.deployVerticle("com.lagerweij.logging.LoggerVerticle", options) { res ->
+        if (res.succeeded()) {
+            startFuture!!.complete()
+        } else {
+            startFuture!!.fail(res.cause())
         }
+      }
 
-        val router = createRouter()
-        router.route().handler(StaticHandler.create())
+      val router = createRouter()
+      router.route().handler(StaticHandler.create())
 
-        var port = 8080
-        var portProperty = System.getProperty("vertx.port")
-        if (portProperty != null) {
-          port = portProperty.toInt()
+      var port = 8080
+      var portProperty = System.getProperty("vertx.port")
+      if (portProperty != null) {
+        port = portProperty.toInt()
+      }
+      println("Starting on port: " + port)
+
+      vertx.createHttpServer()
+        .requestHandler { router.accept(it) }
+        .listen(config().getInteger("http.port", port)) { result ->
+          if (result.succeeded()) {
+              startFuture?.complete()
+          } else {
+              startFuture?.fail(result.cause())
+          }
         }
-        println("Starting on port: " + port)
-
-        vertx.createHttpServer()
-                .requestHandler { router.accept(it) }
-                .listen(config().getInteger("http.port", port)) { result ->
-                    if (result.succeeded()) {
-                        startFuture?.complete()
-                    } else {
-                        startFuture?.fail(result.cause())
-                    }
-                }
     }
 
     private fun createRouter() = Router.router(vertx).apply {
 
-        route("/node_modules/*").handler(StaticHandler.create("node_modules"))
+      route("/node_modules/*").handler(StaticHandler.create("node_modules"))
 
-        route().handler(CookieHandler.create())
-        route().handler(handlerCookieFeatureToggle)
+      route().handler(CookieHandler.create())
+      route().handler(handlerCookieFeatureToggle)
 
-        get("/status").handler(statusHandler)
+      get("/status").handler(statusHandler)
 
-        get("/").handler(handlerRoot)
+      get("/").handler(handlerRoot)
 
-        route("/buy").handler(BodyHandler.create())
-        post("/buy").handler(handlerBuyButton)
+      route("/buy").handler(BodyHandler.create())
+      post("/buy").handler(handlerBuyButton)
     }
 
     // Handlers
     val handlerCookieFeatureToggle = Handler<RoutingContext> { context ->
+      toggles.handleFeatureToggles(context)
 
-        toggles.handleFeatureToggles(context)
-
-        context.next()
+      context.next()
     }
 
     val statusHandler = Handler<RoutingContext> { req ->
@@ -84,23 +83,23 @@ class MainVerticle : AbstractVerticle() {
     }
 
     val handlerRoot = Handler<RoutingContext> { req ->
-        logAction(req, "shop", null)
+      logAction(req, "shop", null)
 
-        req.response().sendFile("webroot/shop.html")
+      req.response().sendFile("webroot/shop.html")
     }
 
     val handlerBuyButton = Handler<RoutingContext> { req ->
-        var jsonData = req.bodyAsJson
+      var jsonData = req.bodyAsJson
 
-        try {
-          logAction(req, "buy", jsonData.encode())
-        } catch (e: Exception) {
-            logger.log("Exception buying: " + e.toString())
-        }
+      try {
+        logAction(req, "buy", jsonData.encode())
+      } catch (e: Exception) {
+        logger.log("Exception buying: " + e.toString())
+      }
 
-        // Here, we could actually do something to make money!
+      // Here, we could actually do something to make money!
 
-        req.response().end()
+      req.response().end()
     }
 
     // Utility methods
@@ -108,15 +107,15 @@ class MainVerticle : AbstractVerticle() {
      * Extension to the HTTP response to output JSON objects.
      */
     fun HttpServerResponse.endWithJson(obj: Any) {
-        this.putHeader("Content-Type", "application/json; charset=utf-8").end(Json.encodePrettily(obj))
+      this.putHeader("Content-Type", "application/json; charset=utf-8").end(Json.encodePrettily(obj))
     }
 
     private fun getCookieValue(req: RoutingContext, cookieName: String): String? {
-        var someCookie = req.getCookie(cookieName)
-        if (someCookie != null) {
-            return someCookie.value
-        }
-        return null
+      var someCookie = req.getCookie(cookieName)
+      if (someCookie != null) {
+          return someCookie.value
+      }
+      return null
     }
 
     private fun logAction(req: RoutingContext, logAction: String, clientMsg: String?) {
