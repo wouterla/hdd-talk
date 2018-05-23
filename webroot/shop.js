@@ -40,25 +40,25 @@ var cart = new Vue({
             });
         },
         timer: function() {
-            cart.added_text = 'Buy within 10 seconds to get a $10,- discount!';
-            cart.buytext = 'Buy with discount, 10 seconds left';
-            cart.discount = 10;
+          cart.buytext = 'Buy with discount, 10 seconds left';
+          cart.added_text = 'Buy within 10 seconds to get a $10,- discount!';
+          cart.discount = 10;
 
-            var counter = 10;
+          var counter = 10;
 
-            var countdown = setInterval(function() {
-                cart.buytext = 'Buy now! ' + counter + ' seconds left';
-                counter--;
-                if (counter < 0) {
-                    clearInterval(countdown);
-                    cart.discount = 0;
-                    cart.setCartTexts();
-                }
-            }, 1000);
+          var countdown = setInterval(function() {
+              cart.buytext = 'Buy now! ' + counter + ' seconds left';
+              counter--;
+              if (counter < 0) {
+                  clearInterval(countdown);
+                  cart.discount = 0;
+                  cart.setCartTexts();
+              }
+          }, 1000);
         },
         setCartTexts: function() {
-            cart.buytext = 'Buy';
-            cart.added_text = 'Buy this book!';
+          cart.buytext = 'Buy';
+          cart.added_text = 'Buy this book!';
         }
     }
 });
