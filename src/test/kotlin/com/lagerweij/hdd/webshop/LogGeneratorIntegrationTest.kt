@@ -62,17 +62,19 @@ class LogGeneratorIntegrationTest {
 
   private val gson = Gson()
 
-  @Test
+  /* @Test
   fun generateShopVisit() {
 
     for (count in 1..300) {
       RestAssured.get("/").then().assertThat().statusCode(200)
     }
-
-  }
+  } */
 
   @Test
   fun generateBuyWithTimer() {
+    for (count in 1..500) {
+      RestAssured.given().cookie("timer", "true").get("/").then().assertThat().statusCode(200)
+    }
     for (count in 1..50) {
       val json = gson.toJson(mapOf("action" to "buy",
         "products" to listOf(1, 2),
@@ -86,6 +88,9 @@ class LogGeneratorIntegrationTest {
 
   @Test
   fun generateBuyWithoutTimer() {
+    for (count in 1..500) {
+      RestAssured.given().cookie("timer", "false").get("/").then().assertThat().statusCode(200)      
+    }
     for (count in 1..20) {
       val json = gson.toJson(mapOf("action" to "buy",
               "products" to listOf(1, 2),
