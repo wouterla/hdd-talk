@@ -14,7 +14,6 @@ class FeatureToggle(logger: Logger) {
 
     private val gson = Gson()
 
-    /* val toggles = mapOf<String, Toggle>("timer" to Toggle("timer", 50)) */
     val toggles = HashMap<String, Toggle>()
 
     fun addToggle(name: String, percentage: Int) {
