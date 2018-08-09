@@ -101,6 +101,8 @@ test {
 
   systemProperty 'java.util.logging.config.file', rootProject.projectDir.toString() + "/local_logging.properties"
 }
+test.outputs.upToDateWhen {false}
+
 
 // Naming and packaging settings for the "shadow jar".
 shadowJar {
