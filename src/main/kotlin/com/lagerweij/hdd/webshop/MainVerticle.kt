@@ -33,11 +33,10 @@ class MainVerticle : AbstractVerticle() {
     private fun createRouter() = Router.router(vertx).apply {
 
       route("/node_modules/*").handler(StaticHandler.create("node_modules"))
+      get("/status").handler(statusHandler)
 
       route().handler(CookieHandler.create())
       route().handler(handlerCookieFeatureToggle)
-
-      get("/status").handler(statusHandler)
 
       get("/").handler(handlerRoot)
 
