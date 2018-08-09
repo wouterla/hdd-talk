@@ -66,11 +66,11 @@
                     <!--<div id="cart-products" v-model="products"></div>-->
                     <ul class="list-group">
                         <li class="list-group-item" v-for="product in products">
-                            <img class="cart_image" v-bind:src="product.img_url"/>{{ product.title }}: {{ product.price
-                            }}
+                            <img class="cart_image" v-bind:src="product.img_url"/>&nbsp;{{ product.title }}: $ {{ product.price
+                            }},-
                         </li>
                     </ul>
-                    <div id="cart-price">Total: $ {{ price }}</div>
+                    <div id="cart-price">Total: $ {{ price }},-</div>
                     <button class="btn btn-lg btn-default" v-on:click="buy">{{ buytext }}</button>
                     <div id="added_text">{{ added_text }}</div>
                 </div>
